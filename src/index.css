@@ -183,3 +183,19 @@ html {
   bottom: 10px !important;
 }
   
+
+.recharts-pie-sector:focus {
+  outline: none !important;
+}
+
+.recharts-pie-sector:active {
+  outline: none !important;
+  stroke: none !important;
+}
+
+.recharts-pie-sector {
+  outline: none !important;
+}
+.chart-container .recharts-pie-sector {
+  outline: none !important;
+}

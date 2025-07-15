@@ -10,6 +10,7 @@ import updatecoin from "../assets/xioimg.png";
 import { getAllHeaderContent } from "../api/admin-api";
 import { Link } from "react-router-dom";
 import checkIcon from "../UserAssets/checkIcon.webp";
+import Solodpr from "../assets/images/SolidProof.png"
 const HeroSection = () => {
   const [content, setContent] = useState(null);
   const sectionRef = useRef();
@@ -418,7 +419,7 @@ const HeroSection = () => {
   {/* Logo with Text */}
   <div className="flex items-center gap-4 mt-4">
     <img
-      src={checkIcon}
+      src={Solodpr}
       alt="SolidProof Icon"
       className="h-10 sm:h-12 md:h-16 brightness-110"
     />
