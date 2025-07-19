@@ -1,10 +1,10 @@
-// import appLogo from "../../assets/app/appLogo.jpg";
-// import appLogoClr from "../../assets/app/appLogoTran.png";
-// import icon from "../../assets/app/icon.png";
+// import appLogo from "../assets/IBOLOGO.png";
+// import appLogoClr from "../assets/IBOLOGO.png";
+// import icon from "../assets/IBOLOGO.png";
 // export const MainContent = {
-//   appName: "ICO XIOCOIN",
+//   appName: "ICO IBOCOIN",
 //   appLogo: appLogoClr,
-//   appLogoClr: appLogoClr,w
+//   appLogoClr: appLogoClr,
 //   appURL: "",
 //   contactNo: "+9876324862552",
 //   email: "info@example.com",
@@ -18,6 +18,6 @@ export const backendConfig = {
   // origin: "https://500rvtdn-6092.inc1.devtunnels.ms/",
   base: "https://ico-backend-e7fo.onrender.com/api",
   origin: "https://ico-backend-e7fo.onrender.com/",
-//   base: "https://api.xiocoin.io/api",
-//  origin: "https://api.xiocoin.io",
+//   base: "https://api.IBOCOIN.io/api",
+//  origin: "https://api.IBOCOIN.io",
 };

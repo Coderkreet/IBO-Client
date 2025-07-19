@@ -3,11 +3,11 @@ import gsap from "gsap";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import icon from "../assets/icon.svg";
-import bg1 from "../assets/coinbg1.png";
-import bg2 from "../assets/coinbg2.png";
-import bg3 from "../assets/coinbg3.png";
-import updatecoin from "../assets/xioimg.png";
-import { getAllHeaderContent } from "../api/admin-api";
+import bg1 from "../assets/IBOLOGO.png";
+import bg2 from "../assets/IBOLOGO.png";
+import bg3 from "../assets/IBOLOGO.png";
+import updatecoin from "../assets/IBOLOGO.png";
+// import { getAllHeaderContent } from "../api/admin-api";
 import { Link } from "react-router-dom";
 import checkIcon from "../UserAssets/checkIcon.webp";
 import Solodpr from "../assets/images/SolidProof.png"
@@ -26,49 +26,21 @@ const HeroSection = () => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getAllHeaderContent();
-        const data = res?.data;
-        let floatImgs =
-          data && data.logoImage && Array.isArray(data.logoImage) && data.logoImage.length > 0
-            ? data.logoImage
-            : [data.logoImage, data.logoImage, data.logoImage];
-
-        setContent({
-          headingLines: [data?.headerTitle || "Your Digital"],
-          exploreText: data?.subTitle || "Explore, Create, and Transact!",
-          description: data?.description || "Xiocoin leverages Web3 technology, ushering in a new era of interaction.",
-          auditText: data?.sideLogoTitle || "Smart Contract Audit By",
-          auditIcon: data?.sideLogo || icon,
-          floatingImages: floatImgs,
-          backgroundCoin: data?.staticImage || updatecoin,
-          lightPaper: data?.lightPaper || "",
-          whitePaper: data?.whitePaper || "",
-          onePager: data?.onePager || "",
-          auditReport: data?.auditReport || "",
-          solidProof: data?.solidProof || "",
-        });
-      } catch (error) {
-        console.error("Failed to fetch header content:", error);
-        setContent({
-          headingLines: [""],
-          exploreText: "",
-          description: "",
-          auditText: "",
-          auditIcon: icon,
-          floatingImages: [bg1, bg2, bg3],
-          backgroundCoin: updatecoin,
-          lightPaper: "",
-          whitePaper: "",
-          onePager: "",
-          auditReport: "",
-          solidProof: "",
-        });
-      }
-    };
-
-    fetchData();
+    // Set dummy data instead of fetching from API
+    setContent({
+      headingLines: ["Your Digital Sandbox in the Web 3.0 Cosmos"],
+      exploreText: "Explore, Create, and Transact!",
+      description: "IBO leverages Web3 technology, ushering in a new era of interaction",
+      auditText: "Smart Contract Audit By",
+      auditIcon: icon,
+      floatingImages: [bg1, bg2, bg3],
+      backgroundCoin: updatecoin,
+      lightPaper: "https://dummyurl.com/lightpaper.pdf",
+      whitePaper: "https://dummyurl.com/whitepaper.pdf",
+      onePager: "https://dummyurl.com/onepager.pdf",
+      auditReport: "https://dummyurl.com/auditreport.pdf",
+      solidProof: "https://dummyurl.com/solidproof.pdf",
+    });
   }, []);
 
   useEffect(() => {
@@ -315,7 +287,7 @@ const HeroSection = () => {
               {content?.exploreText || 'Explore, Create, and Transact!'}
             </p>
             <p className="text-[#AEA7D9]/80 text-sm sm:text-base md:text-lg lg:text-xl text-center leading-relaxed">
-              {content?.description || 'Xiocoin leverages Web3 technology, ushering in a new era of interaction.'}
+              {content?.description || 'IBOcoin leverages Web3 technology, ushering in a new era of interaction.'}
             </p>
 
             <div

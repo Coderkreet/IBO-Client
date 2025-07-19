@@ -114,7 +114,7 @@ export default function LoginPage() {
             
             </div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-[#ddbcfe] via-[#b2a6ff] to-[#AEA7D9] bg-clip-text text-transparent mb-2">
-              XIOCOIN
+              IBOCOIN
             </h1>
             <p className="text-[#727FA6] text-sm">
               Your Digital Sandbox in the Web 3.0 Cosmos

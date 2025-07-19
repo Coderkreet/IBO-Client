@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   PieChart,
   Pie,
@@ -6,735 +6,606 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
-  LabelList,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  BarChart,
+  Bar,
+  Area,
+  AreaChart
 } from "recharts";
-
-import {
-  getTokenomics,
-  getAllMarketStats,
-  getAllTokenTrackers,
-} from "../api/admin-api";
-import AOS from "aos";
-import "aos/dist/aos.css";
+import { TrendingUp, TrendingDown, Users, Activity, DollarSign, Coins, Target, Zap, Shield, Globe } from "lucide-react";
 
 const tabs = ["Token", "Market", "Tracker"];
 
-// Colors array for the pie chart
 const colors = [
-  "#63E6BE",
-  "#EC4899",
-  "#A855F7",
-  "#3B82F6",
-  "#FACC15",
-  "#67E8F9",
-  "#C084FC",
-  "#60A5FA",
-  "#38BDF8",
-  "#818CF8",
-  "#4ADE80",
-  "#F472B6",
-  "#FB923C",
+  "#63E6BE", "#EC4899", "#A855F7", "#3B82F6", "#FACC15",
+  "#67E8F9", "#C084FC", "#60A5FA", "#38BDF8", "#818CF8",
+  "#4ADE80", "#F472B6", "#FB923C",
 ];
 
-export default function TokenomicsTabs() {
+// Static data with enhanced structure
+const staticTokenomicsData = [
+  { 
+    name: "Public Sale", 
+    value: 25, 
+    tokens: "250,000", 
+    color: colors[0],
+    icon: Globe,
+    description: "Available for public purchase",
+    locked: false,
+    vestingPeriod: "0 months"
+  },
+  { 
+    name: "Team & Advisors", 
+    value: 20, 
+    tokens: "200,000", 
+    color: colors[1],
+    icon: Users,
+    description: "Reserved for team and advisors",
+    locked: true,
+    vestingPeriod: "12 months"
+  },
+  { 
+    name: "Marketing", 
+    value: 15, 
+    tokens: "150,000", 
+    color: colors[2],
+    icon: Target,
+    description: "Marketing and partnerships",
+    locked: false,
+    vestingPeriod: "6 months"
+  },
+  { 
+    name: "Staking", 
+    value: 20, 
+    tokens: "200,000", 
+    color: colors[3],
+    icon: Shield,
+    description: "Staking rewards pool",
+    locked: true,
+    vestingPeriod: "3 months"
+  },
+  { 
+    name: "Reserve", 
+    value: 20, 
+    tokens: "200,000", 
+    color: colors[4],
+    icon: Coins,
+    description: "Emergency reserve fund",
+    locked: true,
+    vestingPeriod: "24 months"
+  },
+];
+
+const staticMarketStats = {
+  price: "0.2345",
+  change24h: -2.15,
+  marketCap: "1,234,567",
+  volume24h: "345,678",
+  priceHistory: [
+    { time: "00:00", price: 0.2400 },
+    { time: "04:00", price: 0.2380 },
+    { time: "08:00", price: 0.2350 },
+    { time: "12:00", price: 0.2345 },
+    { time: "16:00", price: 0.2360 },
+    { time: "20:00", price: 0.2340 },
+    { time: "24:00", price: 0.2345 },
+  ]
+};
+
+const staticTokenTrackers = {
+  totalHolders: 123456,
+  holdersChange: 5.6,
+  totalTransactions: 78910,
+  transactionsChange: 3.2,
+  circulatingSupply: 800000,
+  totalSupply: 1000000,
+  BurnedToken: 200000,
+  holdersHistory: [
+    { month: "Jan", holders: 50000 },
+    { month: "Feb", holders: 75000 },
+    { month: "Mar", holders: 95000 },
+    { month: "Apr", holders: 110000 },
+    { month: "May", holders: 123456 },
+  ],
+  transactionHistory: [
+    { day: "Mon", transactions: 1200 },
+    { day: "Tue", transactions: 1800 },
+    { day: "Wed", transactions: 2100 },
+    { day: "Thu", transactions: 1600 },
+    { day: "Fri", transactions: 2400 },
+    { day: "Sat", transactions: 1900 },
+    { day: "Sun", transactions: 1500 },
+  ]
+};
+
+export default function TokenomicsTabsStatic() {
   const [activeTab, setActiveTab] = useState("Token");
-  const [tokenomicsData, setTokenomicsData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [marketStats, setMarketStats] = useState(null);
-  const [tokenTrackers, setTokenTrackers] = useState(null);
+  const [selectedSegment, setSelectedSegment] = useState(null);
+  const [hoveredStat, setHoveredStat] = useState(null);
+  const [gsap, setGsap] = useState(null);
+  const [ScrollTrigger, setScrollTrigger] = useState(null);
+  const [animatedValues, setAnimatedValues] = useState({});
 
-  // GSAP Animation Refs
-  const headerRef = useRef(null);
-  const tabsRef = useRef(null);
+  const sectionRef = useRef(null);
+  const titleRef = useRef(null);
+  const tabsRef = useRef([]);
   const contentRef = useRef(null);
-  const chartRef = useRef(null);
-  const tableRef = useRef(null);
-  const marketRef = useRef(null);
-  const trackerRef = useRef(null);
-  const gsapRef = useRef(null);
 
-  // Initialize GSAP
   useEffect(() => {
-    // Create GSAP instance
-    const gsap = window.gsap || {
-      timeline: () => ({
-        to: () => {},
-        from: () => {},
-        fromTo: () => {},
-        set: () => {},
-      }),
-      to: () => {},
-      from: () => {},
-      fromTo: () => {},
-      set: () => {},
+    // Load GSAP and ScrollTrigger
+    const loadGSAP = async () => {
+      try {
+        const gsapModule = await import('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js');
+        const scrollTriggerModule = await import('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js');
+        
+        const gsapInstance = gsapModule.default || gsapModule;
+        const ScrollTriggerInstance = scrollTriggerModule.default || scrollTriggerModule;
+        
+        gsapInstance.registerPlugin(ScrollTriggerInstance);
+        
+        setGsap(gsapInstance);
+        setScrollTrigger(ScrollTriggerInstance);
+      } catch (error) {
+        console.error('Error loading GSAP:', error);
+      }
     };
 
-    // Try to load GSAP if not available
-    if (!window.gsap) {
-      const script = document.createElement("script");
-      script.src =
-        "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js";
-      script.onload = () => {
-        gsapRef.current = window.gsap;
-        initializeAnimations();
-      };
-      document.head.appendChild(script);
-    } else {
-      gsapRef.current = gsap;
-      initializeAnimations();
-    }
+    loadGSAP();
   }, []);
 
-  const initializeAnimations = () => {
-    const gsap = gsapRef.current;
-    if (!gsap) return;
+  useEffect(() => {
+    if (!gsap || !ScrollTrigger) return;
 
-    // Header entrance animation
-    if (headerRef.current) {
-      gsap.fromTo(
-        headerRef.current,
-        { opacity: 0, y: -50, scale: 0.9 },
-        { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: "back.out(1.7)" }
-      );
-    }
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: 'top 80%',
+        end: 'bottom 20%',
+        toggleActions: 'play none none reverse'
+      }
+    });
 
-    // Tabs stagger animation
-    if (tabsRef.current) {
-      const tabButtons = tabsRef.current.children;
-      gsap.fromTo(
-        tabButtons,
-        { opacity: 0, y: 20, scale: 0.8 },
-        {
-          opacity: 1,
+    // Animate title
+    tl.fromTo(titleRef.current, {
+      y: 50,
+      opacity: 0,
+      scale: 0.8
+    }, {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      duration: 1,
+      ease: 'power3.out'
+    });
+
+    // Animate tabs
+    tabsRef.current.forEach((tab, index) => {
+      if (tab) {
+        tl.fromTo(tab, {
+          y: 30,
+          opacity: 0,
+          scale: 0.8
+        }, {
           y: 0,
-          scale: 1,
-          duration: 0.6,
-          stagger: 0.1,
-          delay: 0.5,
-          ease: "power2.out",
-        }
-      );
-    }
-
-    // Floating animation for header elements
-    gsap.to(headerRef.current?.querySelector("h2"), {
-      y: -10,
-      duration: 2,
-      ease: "power2.inOut",
-      yoyo: true,
-      repeat: -1,
-    });
-
-    // Continuous glow effect for active elements
-    startContinuousAnimations();
-  };
-
-  const startContinuousAnimations = () => {
-    const gsap = gsapRef.current;
-    if (!gsap) return;
-
-    // Subtle breathing effect for the entire section
-    gsap.to(".tokenomics-section", {
-      scale: 1.005,
-      duration: 4,
-      ease: "power2.inOut",
-      yoyo: true,
-      repeat: -1,
-    });
-
-    // Glowing border animation for active tab
-    gsap.to(".active-tab", {
-      boxShadow:
-        "0 0 30px rgba(6, 182, 212, 0.4), 0 0 60px rgba(6, 182, 212, 0.2)",
-      duration: 2,
-      ease: "power2.inOut",
-      yoyo: true,
-      repeat: -1,
-    });
-  };
-
-  const animateTabSwitch = (newTab) => {
-    const gsap = gsapRef.current;
-    if (!gsap) return;
-
-    // Content fade out and in
-    if (contentRef.current) {
-      gsap.to(contentRef.current, {
-        opacity: 0,
-        y: 20,
-        duration: 0.3,
-        ease: "power2.in",
-        onComplete: () => {
-          setActiveTab(newTab);
-          gsap.fromTo(
-            contentRef.current,
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
-          );
-        },
-      });
-    }
-  };
-
-  // Animate content based on active tab
-  useEffect(() => {
-    const gsap = gsapRef.current;
-    if (!gsap) return;
-
-    if (
-      activeTab === "Token" &&
-      chartRef.current &&
-      tableRef.current &&
-      !loading
-    ) {
-      // Chart animation (REMOVE this block to disable pie chart rotation)
-      // gsap.fromTo(chartRef.current,
-      //   { opacity: 0, scale: 0.8, rotation: -10 },
-      //   { opacity: 1, scale: 1, rotation: 0, duration: 0.8, ease: "back.out(1.7)" }
-      // );
-
-      // Table rows stagger
-      const tableRows = tableRef.current?.querySelectorAll("tbody tr");
-      if (tableRows) {
-        gsap.fromTo(
-          tableRows,
-          { opacity: 0, x: -50 },
-          { opacity: 1, x: 0, duration: 0.5, stagger: 0.1, delay: 0.3 }
-        );
-      }
-
-      // Pie chart rotation (REMOVE this block to disable pie chart rotation)
-      // gsap.to(chartRef.current?.querySelector('.recharts-pie'), {
-      //   rotation: 360,
-      //   duration: 20,
-      //   ease: "none",
-      //   repeat: -1,
-      //   transformOrigin: "center"
-      // });
-    }
-
-    if (activeTab === "Market" && marketRef.current && !loading) {
-      const elements = marketRef.current.children;
-      gsap.fromTo(
-        elements,
-        { opacity: 0, y: 30, scale: 0.9 },
-        {
           opacity: 1,
-          y: 0,
           scale: 1,
-          duration: 0.6,
-          stagger: 0.2,
-          ease: "power2.out",
-        }
-      );
-
-      // Price pulsing effect
-      const priceElement = marketRef.current?.querySelector(".price-display");
-      if (priceElement) {
-        gsap.to(priceElement, {
-          scale: 1.05,
-          duration: 1.5,
-          ease: "power2.inOut",
-          yoyo: true,
-          repeat: -1,
-        });
+          duration: 0.5,
+          ease: 'power2.out'
+        }, `-=${0.3 - index * 0.1}`);
       }
-    }
+    });
 
-    if (activeTab === "Tracker" && trackerRef.current && !loading) {
-      const cards = trackerRef.current?.querySelectorAll(".tracker-card");
-      if (cards) {
-        gsap.fromTo(
-          cards,
-          { opacity: 0, y: 40, rotationX: -15 },
-          {
-            opacity: 1,
-            y: 0,
-            rotationX: 0,
-            duration: 0.7,
-            stagger: 0.15,
-            ease: "power2.out",
-          }
-        );
-      }
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+  }, [gsap, ScrollTrigger]);
 
-      // Stats counter animation
-      const statsElements =
-        trackerRef.current?.querySelectorAll(".stat-number");
-      if (statsElements) {
-        statsElements.forEach((el) => {
-          gsap.from(el, {
-            textContent: 0,
-            duration: 2,
-            ease: "power2.out",
-            snap: { textContent: 1 },
-            onUpdate: function () {
-              el.textContent = Math.floor(
-                this.targets()[0].textContent
-              ).toLocaleString();
-            },
-          });
-        });
-      }
-    }
-  }, [activeTab, loading, tokenomicsData, marketStats, tokenTrackers]);
+  useEffect(() => {
+    if (!gsap || !contentRef.current) return;
 
-  // Hover animations for interactive elements
-  const addHoverAnimations = () => {
-    const gsap = gsapRef.current;
+    // Animate content when tab changes
+    gsap.fromTo(contentRef.current, {
+      opacity: 0,
+      y: 30,
+      scale: 0.95
+    }, {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      duration: 0.6,
+      ease: 'power2.out'
+    });
+  }, [activeTab, gsap]);
+
+  // Animate numbers
+  useEffect(() => {
     if (!gsap) return;
 
-    // Tab buttons hover
-    document.querySelectorAll(".tab-button").forEach((button) => {
-      button.addEventListener("mouseenter", () => {
-        gsap.to(button, { scale: 1.05, duration: 0.3, ease: "power2.out" });
+    const animateNumber = (start, end, key) => {
+      gsap.to(animatedValues, {
+        [key]: end,
+        duration: 2,
+        ease: 'power2.out',
+        onUpdate: () => {
+          setAnimatedValues(prev => ({ ...prev, [key]: prev[key] || start }));
+        }
       });
-      button.addEventListener("mouseleave", () => {
-        gsap.to(button, { scale: 1, duration: 0.3, ease: "power2.out" });
-      });
-    });
+    };
 
-    // Table rows hover
-    document.querySelectorAll(".table-row").forEach((row) => {
-      row.addEventListener("mouseenter", () => {
-        gsap.to(row, { x: 10, duration: 0.3, ease: "power2.out" });
-      });
-      row.addEventListener("mouseleave", () => {
-        gsap.to(row, { x: 0, duration: 0.3, ease: "power2.out" });
-      });
-    });
-  };
-
-
-
-  useEffect(() => {
-    addHoverAnimations();
-  }, [tokenomicsData]);
-
-  useEffect(() => {
-    fetchTokenomicsData();
-    fetchMarketStats();
-    fetchTokenTrackers();
-  }, []);
-
-  const fetchTokenomicsData = async () => {
-    try {
-      setLoading(true);
-      const response = await getTokenomics();
-      if (response?.data) {
-        const transformedData = response.data.map((item, index) => ({
-          ...item,
-          name: item.title,
-          value: item.percentage,
-          tokens: item.tokenQuantity.toLocaleString(),
-          color: colors[index % colors.length],
-        }));
-        setTokenomicsData(transformedData);
-      }
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching tokenomics:", err);
-      setError("Failed to fetch tokenomics data");
-    } finally {
-      setLoading(false);
+    // Animate various numbers based on active tab
+    if (activeTab === "Tracker") {
+      animateNumber(0, staticTokenTrackers.totalHolders, 'totalHolders');
+      animateNumber(0, staticTokenTrackers.totalTransactions, 'totalTransactions');
     }
-  };
+  }, [activeTab, gsap]);
 
-useEffect(() => {
-  const removeFocusFromPieSlices = () => {
-    const sectors = document.querySelectorAll(".recharts-pie-sector");
-    sectors.forEach((sector) => {
-      sector.setAttribute("tabindex", "-1");
-      sector.setAttribute("focusable", "false");
-      sector.style.outline = "none";
-      sector.style.stroke = "none";
-    });
-  };
-
-  // Run on initial load and whenever data changes
-  removeFocusFromPieSlices();
-}, [tokenomicsData]);
-
-
-  const fetchMarketStats = async () => {
-    try {
-      setLoading(true);
-      const response = await getAllMarketStats();
-      if (response.data && response.data.length > 0) {
-        setMarketStats(response.data[0]);
-      }
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching market stats:", err);
-      setError("Failed to load market data");
-    } finally {
-      setLoading(false);
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-[#120540]/95 backdrop-blur-sm border border-[#4A088C]/50 rounded-lg p-3 shadow-xl">
+          <p className="text-[#AEA7D9] font-semibold">{label}</p>
+          <p className="text-white">
+            {payload[0].name}: <span className="text-[#4A088C] font-bold">{payload[0].value}</span>
+          </p>
+        </div>
+      );
     }
-  };
-
-  const fetchTokenTrackers = async () => {
-    try {
-      setLoading(true);
-      const response = await getAllTokenTrackers();
-      if (response?.data) {
-        setTokenTrackers(response.data);
-      }
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching token trackers:", err);
-      setError("Failed to load token tracker data");
-    } finally {
-      setLoading(false);
-    }
+    return null;
   };
 
   const renderTable = () => (
-    <div className="overflow-x-auto w-full" ref={tableRef}>
-      <table className="w-full text-left text-[#AEA7D9]">
-        <thead className="uppercase bg-gradient-to-r from-[#4A088C] to-[#433C73] text-white">
-          <tr>
-            <th className="text-[1rem] font-semibold">Details</th>
-            <th className="text-[1rem] font-semibold">% (Ptc.)</th>
-            <th className="text-[1rem] font-semibold">Token Qty</th>
-          </tr>
-        </thead>
-        <tbody className="bg-[#120540]/50">
-          {tokenomicsData.map((item) => (
-            <tr
-              key={item._id}
-              className="border-b border-[#727FA6]/40 hover:bg-[#433C73]/30 transition-colors duration-200"
-            >
-              <td className="text-[0.9rem] text-white">{item.title}</td>
-              <td className="text-[0.9rem] text-[#AEA7D9]">
-                {item.percentage}%
-              </td>
-              <td className="text-[0.9rem] text-[#AEA7D9]">
-                {item.tokenQuantity.toLocaleString()}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="space-y-4">
+      {staticTokenomicsData.map((item, index) => {
+        const IconComponent = item.icon;
+        return (
+          <div
+            key={index}
+            className={`relative group bg-gradient-to-r from-[#120540]/50 to-[#1b0a2d]/50 rounded-xl p-4 border border-[#727FA6]/30 hover:border-[#4A088C]/60 transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+              selectedSegment === index ? 'border-[#4A088C] bg-[#4A088C]/10' : ''
+            }`}
+            onClick={() => setSelectedSegment(selectedSegment === index ? null : index)}
+          >
+            <div className="flex items-center gap-4">
+              <div 
+                className="w-12 h-12 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: item.color + '20' }}
+              >
+                <IconComponent className="w-6 h-6" style={{ color: item.color }} />
+              </div>
+              
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-white font-semibold text-lg">{item.name}</h4>
+                  <div className="flex items-center gap-4">
+                    <span className="text-[#AEA7D9] font-medium">{item.value}%</span>
+                    <span className="text-white font-bold">{item.tokens}</span>
+                  </div>
+                </div>
+                
+                <div className="mt-2 flex items-center gap-4">
+                  <div className="flex-1 bg-[#433C73]/30 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="h-full transition-all duration-1000 ease-out"
+                      style={{ 
+                        width: `${item.value}%`,
+                        backgroundColor: item.color
+                      }}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {item.locked && (
+                      <span className="text-xs px-2 py-1 bg-red-500/20 text-red-300 rounded-full">
+                        Locked
+                      </span>
+                    )}
+                    <span className="text-xs text-[#AEA7D9]">
+                      {item.vestingPeriod}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {selectedSegment === index && (
+              <div className="mt-4 pt-4 border-t border-[#727FA6]/30">
+                <p className="text-[#AEA7D9] text-sm">{item.description}</p>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 
-  const renderMarket = () => {
-    if (loading)
-      return (
-        <p className="text-center text-[#AEA7D9]">Loading market data...</p>
-      );
-    if (error) return <p className="text-red-400 text-center">{error}</p>;
-    if (!marketStats) return null;
+  const renderMarket = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-gradient-to-br from-[#120540]/60 via-[#1b0a2d]/60 to-[#433C73]/60 rounded-xl p-6 border border-[#727FA6]/30">
+          <div className="text-center mb-6">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <DollarSign className="w-8 h-8 text-[#4A088C]" />
+              <h3 className="text-2xl font-bold text-white">Current Price</h3>
+            </div>
+            <p className="text-4xl font-bold text-transparent bg-gradient-to-r from-[#4A088C] to-[#AEA7D9] bg-clip-text mb-2">
+              ${staticMarketStats.price}
+            </p>
+            <div className="flex items-center justify-center gap-2">
+              {staticMarketStats.change24h >= 0 ? (
+                <TrendingUp className="w-5 h-5 text-green-400" />
+              ) : (
+                <TrendingDown className="w-5 h-5 text-red-400" />
+              )}
+              <span className={`text-lg font-semibold ${staticMarketStats.change24h >= 0 ? "text-green-400" : "text-red-400"}`}>
+                {staticMarketStats.change24h >= 0 ? "+" : ""}
+                {staticMarketStats.change24h}% (24h)
+              </span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-4 bg-[#4A088C]/10 rounded-lg">
+              <p className="text-lg font-bold text-white">Market Cap</p>
+              <p className="text-[#AEA7D9] text-xl">${staticMarketStats.marketCap}</p>
+            </div>
+            <div className="text-center p-4 bg-[#4A088C]/10 rounded-lg">
+              <p className="text-lg font-bold text-white">Volume 24h</p>
+              <p className="text-[#AEA7D9] text-xl">${staticMarketStats.volume24h}</p>
+            </div>
+          </div>
+        </div>
 
-    return (
-      <div
-        ref={marketRef}
-        className="bg-gradient-to-br from-[#120540]/60 via-[#1b0a2d]/60 to-[#433C73]/60 rounded-xl p-8 border border-[#727FA6]/30 break-words whitespace-normal"
-      >
-        <div className="flex flex-col items-center justify-between mb-6 break-words whitespace-normal">
-          <p className="text-lg font-semibold text-[#AEA7D9] mb-2 break-words whitespace-normal">
-            Today's Market Price:
-          </p>
-          <p className="text-3xl font-bold text-transparent bg-gradient-to-r from-[#AEA7D9] to-white bg-clip-text mb-2 break-words whitespace-normal">
-            ${marketStats.price}
-          </p>
-          <p
-            className={`text-lg font-semibold ${
-              marketStats.change24h >= 0 ? "text-green-400" : "text-red-400"
-            } break-words whitespace-normal`}
+        <div className="bg-gradient-to-br from-[#120540]/60 via-[#1b0a2d]/60 to-[#433C73]/60 rounded-xl p-6 border border-[#727FA6]/30">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <Activity className="w-6 h-6 text-[#4A088C]" />
+            24h Price Chart
+          </h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={staticMarketStats.priceHistory}>
+              <defs>
+                <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#4A088C" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#4A088C" stopOpacity={0.1}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#727FA6" opacity={0.3} />
+              <XAxis dataKey="time" stroke="#AEA7D9" />
+              <YAxis stroke="#AEA7D9" />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey="price"
+                stroke="#4A088C"
+                strokeWidth={2}
+                fill="url(#priceGradient)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderTracker = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div 
+          className={`p-6 rounded-xl border transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+            hoveredStat === 'holders' ? 'bg-[#433C73]/30 border-[#4A088C]' : 'bg-[#433C73]/20 border-[#727FA6]/30'
+          }`}
+          onMouseEnter={() => setHoveredStat('holders')}
+          onMouseLeave={() => setHoveredStat(null)}
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <Users className="w-8 h-8 text-[#4A088C]" />
+            <div>
+              <p className="text-xl text-[#AEA7D9] font-bold">Total Holders</p>
+              <p className="text-3xl font-bold text-white">
+                {(animatedValues.totalHolders || 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-green-400" />
+            <span className="text-sm text-green-400">
+              {staticTokenTrackers.holdersChange}% this week
+            </span>
+          </div>
+        </div>
+
+        <div 
+          className={`p-6 rounded-xl border transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+            hoveredStat === 'transactions' ? 'bg-[#4A088C]/30 border-[#4A088C]' : 'bg-[#4A088C]/20 border-[#727FA6]/30'
+          }`}
+          onMouseEnter={() => setHoveredStat('transactions')}
+          onMouseLeave={() => setHoveredStat(null)}
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <Activity className="w-8 h-8 text-[#4A088C]" />
+            <div>
+              <p className="text-xl text-[#AEA7D9] font-bold">Total Transactions</p>
+              <p className="text-3xl font-bold text-white">
+                {(animatedValues.totalTransactions || 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-green-400" />
+            <span className="text-sm text-green-400">
+              {staticTokenTrackers.transactionsChange}% this week
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-gradient-to-br from-[#120540]/60 via-[#1b0a2d]/60 to-[#433C73]/60 rounded-xl p-6 border border-[#727FA6]/30">
+          <h3 className="text-xl font-bold text-white mb-4">Holders Growth</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={staticTokenTrackers.holdersHistory}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#727FA6" opacity={0.3} />
+              <XAxis dataKey="month" stroke="#AEA7D9" />
+              <YAxis stroke="#AEA7D9" />
+              <Tooltip content={<CustomTooltip />} />
+              <Line
+                type="monotone"
+                dataKey="holders"
+                stroke="#4A088C"
+                strokeWidth={3}
+                dot={{ fill: '#4A088C', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, fill: '#AEA7D9' }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-gradient-to-br from-[#120540]/60 via-[#1b0a2d]/60 to-[#433C73]/60 rounded-xl p-6 border border-[#727FA6]/30">
+          <h3 className="text-xl font-bold text-white mb-4">Weekly Transactions</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={staticTokenTrackers.transactionHistory}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#727FA6" opacity={0.3} />
+              <XAxis dataKey="day" stroke="#AEA7D9" />
+              <YAxis stroke="#AEA7D9" />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="transactions" fill="#4A088C" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { label: "Circulating Supply", value: staticTokenTrackers.circulatingSupply, icon: Coins },
+          { label: "Total Supply", value: staticTokenTrackers.totalSupply, icon: Target },
+          { label: "Burned Tokens", value: staticTokenTrackers.BurnedToken, icon: Zap },
+          { label: "Max Supply", value: 1234567890, icon: Shield },
+        ].map((stat, i) => (
+          <div 
+            key={i} 
+            className="bg-[#120540]/50 p-4 rounded-lg text-center hover:bg-[#120540]/70 transition-all duration-300 cursor-pointer transform hover:scale-105"
           >
-            {marketStats.change24h >= 0 ? "+" : ""}
-            {marketStats.change24h}% (24h)
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-6 mt-6">
-          <div className="text-center break-words whitespace-normal">
-            <p className="text-lg font-bold text-white break-words whitespace-normal">
-              Market Cap
-            </p>
-            <p className="text-[#AEA7D9] break-words whitespace-normal">
-              ${marketStats.marketCap}
-            </p>
+            <stat.icon className="w-6 h-6 text-[#4A088C] mx-auto mb-2" />
+            <p className="text-[#AEA7D9] text-sm font-medium">{stat.label}</p>
+            <p className="text-white font-bold">{stat.value.toLocaleString()}</p>
           </div>
-          <div className="text-center break-words whitespace-normal">
-            <p className="text-lg font-bold text-white break-words whitespace-normal">
-              Volume 24h
-            </p>
-            <p className="text-[#AEA7D9] break-words whitespace-normal">
-              ${marketStats.volume24h}
-            </p>
-          </div>
-        </div>
+        ))}
       </div>
-    );
-  };
-
-  const renderTracker = () => {
-    if (loading)
-      return (
-        <p className="text-center text-[#AEA7D9]">Loading tracker data...</p>
-      );
-    if (error) return <p className="text-red-400 text-center">{error}</p>;
-    if (!tokenTrackers) return null;
-
-    return (
-      <div
-        ref={trackerRef}
-        className="bg-gradient-to-br from-[#120540]/60 via-[#1b0a2d]/60 to-[#433C73]/60 rounded-xl p-8 border border-[#727FA6]/30 break-words whitespace-normal"
-      >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="p-6 rounded-xl border border-[#727FA6]/30 bg-[#433C73]/20 break-words whitespace-normal">
-            <p className="text-xl text-[#AEA7D9] font-bold mb-1 break-words whitespace-normal">
-              Total Holders
-            </p>
-            <p className="text-3xl font-bold text-white break-words whitespace-normal">
-              {tokenTrackers.totalHolders.toLocaleString()}
-            </p>
-            <p
-              className={`text-sm ${
-                parseFloat(tokenTrackers.holdersChange) >= 0
-                  ? "text-green-400"
-                  : "text-red-400"
-              } break-words whitespace-normal`}
-            >
-              {tokenTrackers.holdersChange}% this week
-            </p>
-          </div>
-          <div className="p-6 rounded-xl border border-[#727FA6]/30 bg-[#4A088C]/20 break-words whitespace-normal">
-            <p className="text-xl text-[#AEA7D9] font-bold mb-1 break-words whitespace-normal">
-              Total Transactions
-            </p>
-            <p className="text-3xl font-bold text-white break-words whitespace-normal">
-              {tokenTrackers.totalTransactions.toLocaleString()}
-            </p>
-            <p
-              className={`text-sm ${
-                parseFloat(tokenTrackers.transactionsChange) >= 0
-                  ? "text-green-400"
-                  : "text-red-400"
-              } break-words whitespace-normal`}
-            >
-              {tokenTrackers.transactionsChange}% this week
-            </p>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-          <div className="bg-[#120540]/50 p-4 rounded-lg text-center break-words whitespace-normal">
-            <p className="text-[#AEA7D9] text-sm font-medium break-words whitespace-normal">
-              Circulating Supply
-            </p>
-            <p className="text-white font-bold break-words whitespace-normal">
-              {tokenTrackers.circulatingSupply.toLocaleString()}
-            </p>
-          </div>
-          <div className="bg-[#120540]/50 p-4 rounded-lg text-center break-words whitespace-normal">
-            <p className="text-[#AEA7D9] text-sm font-medium break-words whitespace-normal">
-              Total Supply
-            </p>
-            <p className="text-white font-bold break-words whitespace-normal">
-              {tokenTrackers.totalSupply.toLocaleString()}
-            </p>
-          </div>
-          <div className="bg-[#120540]/50 p-4 rounded-lg text-center break-words whitespace-normal">
-            <p className="text-[#AEA7D9] text-sm font-medium break-words whitespace-normal">
-              Burned Tokens
-            </p>
-            <p className="text-white font-bold break-words whitespace-normal">
-              {tokenTrackers.BurnedToken.toLocaleString()}
-            </p>
-          </div>
-          <div className="bg-[#120540]/50 p-4 rounded-lg text-center break-words whitespace-normal">
-            <p className="text-[#AEA7D9] text-sm font-medium break-words whitespace-normal">
-              Max Supply
-            </p>
-            <p className="text-white font-bold break-words whitespace-normal">
-              1234567890
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  useEffect(() => {
-    // Initialize AOS
-    AOS.init({
-      duration: 900,
-      once: true,
-      offset: 60,
-      easing: "ease-in-out",
-    });
-  }, []);
-
-  const renderCustomLabel = ({ percent, x, y, midAngle }) => {
-    if (percent < 0.05) return null; // skip small values
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="#fff"
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize={12}
-        fontWeight="bold"
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
-  };
+    </div>
+  );
 
   return (
-    <section className="relative py-16 px-4 sm:px-6 md:px-12 bg-gradient-to-b from-[#433C73] via-[#1b0a2d] to-[#120540]">
-      <div className="max-w-7xl mx-auto">
-        <div ref={headerRef} className="text-center mb-10" data-aos="fade-down">
-          <h2 className=" text-4xl sm:text-6xl font-extrabold bg-gradient-to-r from-[#4A088C] to-[#AEA7D9] bg-clip-text text-transparent drop-shadow mb-4">
+    <section 
+      ref={sectionRef}
+      className="relative py-20 px-4 sm:px-6 md:px-12 bg-gradient-to-b from-[#433C73] via-[#1b0a2d] to-[#120540] overflow-hidden"
+    >
+      {/* Animated Background */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-[#4A088C] to-[#AEA7D9] rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-72 h-72 bg-gradient-to-r from-[#AEA7D9] to-[#4A088C] rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="text-center mb-16">
+          <h2 
+            ref={titleRef}
+            className="text-5xl md:text-7xl font-extrabold bg-gradient-to-r from-[#4A088C] via-[#AEA7D9] to-[#4A088C] bg-clip-text text-transparent mb-8"
+            style={{
+              backgroundSize: '200% 200%',
+              animation: 'gradient 3s ease infinite'
+            }}
+          >
             Tokenomics
           </h2>
-          <div
-            ref={tabsRef}
-            className="flex justify-center flex-wrap gap-4"
-            data-aos="fade-up"
-            data-aos-delay="200"
-          >
-            {tabs.map((tab) => (
+          
+          <div className="flex justify-center flex-wrap gap-4">
+            {tabs.map((tab, index) => (
               <button
                 key={tab}
-                onClick={() => animateTabSwitch(tab)}
-                className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-300 border shadow-md
-                  ${
-                    activeTab === tab
-                      ? "bg-gradient-to-r from-[#4A088C] to-[#433C73] text-white border-transparent"
-                      : "bg-[#120540] text-[#AEA7D9] border-[#727FA6] hover:bg-[#433C73]/30"
-                  }`}
-                data-aos="zoom-in"
-                data-aos-delay={300 + tabs.indexOf(tab) * 100}
+                ref={el => tabsRef.current[index] = el}
+                onClick={() => setActiveTab(tab)}
+                className={`relative px-8 py-4 rounded-2xl text-lg font-bold transition-all duration-300 transform hover:scale-105 ${
+                  activeTab === tab
+                    ? "bg-gradient-to-r from-[#4A088C] to-[#AEA7D9] text-white shadow-2xl shadow-[#4A088C]/25"
+                    : "bg-[#120540]/80 backdrop-blur-sm text-[#AEA7D9] hover:bg-[#120540] border border-[#433C73]/50 hover:border-[#4A088C]/50"
+                }`}
               >
                 {tab}
+                {activeTab === tab && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#4A088C] to-[#AEA7D9] rounded-2xl blur opacity-50 -z-10"></div>
+                )}
               </button>
             ))}
           </div>
-          {/* <p className="mt-6 text-[#AEA7D9] max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="400">
-            Our comprehensive token distribution strategy ensures a robust and sustainable ecosystem with strategic allocations for private/public sales, marketing initiatives, staking rewards, and R&D investments to promote long-term growth and community engagement.
-          </p> */}
         </div>
-        <div ref={contentRef} data-aos="fade-up" data-aos-delay="500">
+
+        <div ref={contentRef}>
           {activeTab === "Token" && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div
-                ref={chartRef}
-                className="bg-gradient-to-br from-[#120540]/70 via-[#1b0a2d]/70 to-[#433C73]/70 rounded-xl px-4 py-6 border border-[#727FA6]/50 w-full max-w-full overflow-x-hidden"
-                data-aos="zoom-in"
-                data-aos-delay="600"
-              >
-                <h3 className="text-lg sm:text-xl font-bold text-center mb-4 text-[#AEA7D9]">
-                  Token Distribution Chart
+              <div className="bg-gradient-to-br from-[#120540]/70 via-[#1b0a2d]/70 to-[#433C73]/70 rounded-2xl p-6 border border-[#727FA6]/50">
+                <h3 className="text-2xl font-bold text-center mb-6 text-[#AEA7D9] flex items-center justify-center gap-2">
+                  <Target className="w-6 h-6" />
+                  Token Distribution
                 </h3>
-
-                {loading ? (
-                  <p className="text-center text-[#AEA7D9]">Loading chart...</p>
-                ) : error ? (
-                  <p className="text-center text-red-400">{error}</p>
-                ) : (
-                  <div className="w-full">
-                    <ResponsiveContainer
-                      width="100%"
-                      height={window.innerWidth < 640 ? 250 : 300} // Adjust height for small screens
+                <ResponsiveContainer width="100%" height={350}>
+                  <PieChart>
+                    <Pie
+                      data={staticTokenomicsData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="45%"
+                      outerRadius={120}
+                      stroke="#1f2937"
+                      strokeWidth={2}
                     >
-                      <PieChart>
-                        <Pie
-                          data={tokenomicsData}
-                          dataKey="value"
-                          nameKey="name"
-                          cx="50%"
-                          cy="45%"
-                          outerRadius={window.innerWidth < 640 ? 80 : 100}
-                          stroke="#1f2937"
-                          labelLine={false}
-                          // label={renderCustomLabel}
-                        >
-                          {tokenomicsData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "white",
-                            border: "1px solid #727FA6",
-                            borderRadius: "12px",
-                            color: "#AEA7D9",
-                            fontSize: "0.875rem",
-                            boxShadow: "0 0 10px rgba(0,0,0,0.3)",
-                            backdropFilter: "blur(6px)",
+                      {staticTokenomicsData.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={entry.color}
+                          style={{
+                            filter: selectedSegment === index ? 'brightness(1.2)' : 'brightness(1)',
+                            cursor: 'pointer'
                           }}
-                          formatter={(value, name) => [`${value}%`, name]}
+                          onClick={() => setSelectedSegment(selectedSegment === index ? null : index)}
                         />
-                        <Legend
-                          verticalAlign="bottom"
-                          height={70}
-                          iconType="circle"
-                          wrapperStyle={{
-                            color: "#AEA7D9",
-                            fontSize: "0.75rem",
-                            textAlign: "center",
-                            paddingTop: "10px",
-                            display: "flex",
-                            justifyContent: "center",
-                            flexWrap: "wrap",
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={70} 
+                      iconType="circle"
+                      wrapperStyle={{ fontSize: '14px' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
-              <style>
-  {`
-    .recharts-pie-sector:focus,
-    .recharts-pie-sector:active {
-      outline: none !important;
-      stroke: none !important;
-    }
-    .recharts-pie-sector {
-      outline: none !important;
-    }
-  `}
-</style>
-
-
-              <div
-                className="bg-gradient-to-br from-[#120540]/70 via-[#1b0a2d]/70 to-[#433C73]/70 rounded-xl p-6 border border-[#727FA6]/50"
-                data-aos="zoom-in"
-                data-aos-delay="700"
-              >
-                <h3 className="text-xl font-bold text-center mb-4 text-[#AEA7D9]">
+              
+              <div className="bg-gradient-to-br from-[#120540]/70 via-[#1b0a2d]/70 to-[#433C73]/70 rounded-2xl p-6 border border-[#727FA6]/50">
+                <h3 className="text-2xl font-bold text-center mb-6 text-[#AEA7D9] flex items-center justify-center gap-2">
+                  <Coins className="w-6 h-6" />
                   Detailed Breakdown
                 </h3>
-                {loading ? (
-                  <p className="text-center">Loading table...</p>
-                ) : error ? (
-                  <p className="text-red-400 text-center">{error}</p>
-                ) : (
-                  renderTable()
-                )}
+                {renderTable()}
               </div>
             </div>
           )}
 
-          {activeTab === "Market" && (
-            <div data-aos="fade-up" data-aos-delay="600">
-              {renderMarket()}
-            </div>
-          )}
-
-          {activeTab === "Tracker" && (
-            <div data-aos="fade-up" data-aos-delay="600">
-              {renderTracker()}
-            </div>
-          )}
+          {activeTab === "Market" && renderMarket()}
+          {activeTab === "Tracker" && renderTracker()}
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes gradient {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
     </section>
   );
 }

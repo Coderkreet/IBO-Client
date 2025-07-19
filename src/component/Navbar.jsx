@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
-import { getAllHeaderContent } from '../api/admin-api';
-import logo from '../assets/coinbg3.png';
+import logo from '../assets/IBOLOGO.png';
 import { Link } from 'react-router-dom';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [activeSection, setActiveSection] = useState('');
-    const [logoUrl, setLogoUrl] = useState("");
 
     const navItems = [
         { label: 'Products', path: '#products' },
@@ -24,20 +22,7 @@ const Navbar = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const fetchData = async () => {
-        try {
-            const res = await getAllHeaderContent();
-            if (res?.data?.navLogo) {
-                setLogoUrl(res.data.navLogo);
-            }
-        } catch (err) {
-            console.error("Error fetching logo:", err);
-        }
-    };
-
-    useEffect(() => {
-        fetchData();
-    }, []);
+ 
 
     // Handle scroll effect and active section
     useEffect(() => {
@@ -84,7 +69,7 @@ const Navbar = () => {
       <nav
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-[#f12dc093] backdrop-blur-md shadow-xl'
+            ? 'bg-[#29297193] backdrop-blur-md shadow-xl'
             : 'bg-white/10 backdrop-blur-lg shadow-sm'
         }`}
       >
@@ -93,7 +78,7 @@ const Navbar = () => {
             {/* Logo Section */}
             <div className="flex items-center group cursor-pointer">
               <div onClick={scrollToTop} className="w-10 h-10 lg:w-[6rem] lg:h-[6rem]  rounded-xl flex items-center justify-center  transform transition-all duration-300 group-hover:scale-105 group-hover:shadow-purple-500/25">
-                <img src={logoUrl} alt="" />
+                <img src={logo} alt="" />
               </div>
               <div className="ml-3 hidden sm:block">
                 <h1 className="text-white font-bold text-lg lg:text-xl"></h1>

@@ -63,7 +63,7 @@ const Landing = () => {
       <div  id="platform">
         <PlatformSection />
       </div>
-      <div id="xiocoin-blockchain">
+      <div id="IBOCOIN-blockchain">
 
         <WalletConnect/>
 

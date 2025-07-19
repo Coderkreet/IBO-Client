@@ -1,4 +1,4 @@
-const CACHE_NAME = 'xiocoin-cache-v1';
+const CACHE_NAME = 'ibocoin-cache-v1';
 const ASSETS = [
     '/',
     '/index.html',

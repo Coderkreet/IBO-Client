@@ -1,45 +1,52 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Tilt from "react-parallax-tilt";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { getAllListedPlatforms } from "../api/admin-api";
-import { Link } from "react-router-dom";
 
 const ListedOnSection = () => {
-  const [platforms, setPlatforms] = useState([]);
-  const [platformName, setPlatformName] = useState('');
   const sliderRef = useRef(null);
   const animationFrameRef = useRef(null);
   const scrollAmountRef = useRef(0);
   const isPausedRef = useRef(false);
 
-  useEffect(() => {
-    AOS.init({ duration: 100, once: true });
-  }, []);
+  const platforms = [
+    {
+      title: "Trust Wallet",
+      link: "https://trustwallet.com/",
+      image: "https://seeklogo.com/images/T/trustwallet-logo-112F8E2965-seeklogo.com.png",
+    },
+    {
+      title: "BitMart",
+      link: "https://www.bitmart.com/",
+      image: "https://cryptologos.cc/logos/bitmart-token-bmx-logo.png",
+    },
+    {
+      title: "Hello",
+      link: "https://www.hello.one/",
+      image: "https://hello.one/images/logo-white.svg",
+    },
+    {
+      title: "CoinStore",
+      link: "https://www.coinstore.com/",
+      image: "https://assets-global.website-files.com/6375cba9371ee5c68686baf3/6375cba9371ee55aa886bafb_Coinstore_Logo.png",
+    },
+    {
+      title: "XT.COM",
+      link: "https://www.xt.com/",
+      image: "https://pbs.twimg.com/profile_images/1753245290717325312/ZZH-4Xcv_400x400.jpg",
+    },
+    {
+      title: "MEXC",
+      link: "https://www.mexc.com/",
+      image: "https://cryptologos.cc/logos/mexc-global-mexc-logo.png",
+    },
+  ];
+
+  const sliderItems = [...platforms, ...platforms]; // duplicated for loop scroll
 
   useEffect(() => {
-    const fetchPlatforms = async () => {
-      try {
-        const res = await getAllListedPlatforms();
-        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
-          setPlatforms(res.data[0].platforms || []);
-          setPlatformName(res.data[0].platformName || '');
-        } else if (res.data && res.data.platforms) {
-          setPlatforms(res.data.platforms);
-          setPlatformName(res.data.platformName || '');
-        } else {
-          setPlatforms([]);
-          setPlatformName('');
-        }
-      } catch {
-        setPlatforms([]);
-        setPlatformName('');
-      }
-    };
-    fetchPlatforms();
+    AOS.init({ duration: 1000, once: true });
   }, []);
-
-  const sliderItems = [...platforms, ...platforms]; // for infinite loop effect
 
   useEffect(() => {
     const slider = sliderRef.current;
@@ -58,7 +65,7 @@ const ListedOnSection = () => {
 
     animate();
     return () => cancelAnimationFrame(animationFrameRef.current);
-  }, [platforms]);
+  }, []);
 
   const handleMouseEnter = () => {
     isPausedRef.current = true;
@@ -71,11 +78,9 @@ const ListedOnSection = () => {
   return (
     <section className="w-full py-12 px-4 bg-gradient-to-r from-[#6e00ff] via-[#9b00cc] to-[#ff007a] text-white">
       <div className="max-w-8xl mx-auto text-center">
-        {platformName && (
-          <h2 className="text-2xl sm:text-3xl  md:text-4xl font-bold mb-[3rem]" data-aos="fade-up">
-            {platformName}
-          </h2>
-        )}
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-[3rem]" data-aos="fade-up">
+          Listed On
+        </h2>
 
         <div
           ref={sliderRef}
@@ -84,29 +89,34 @@ const ListedOnSection = () => {
         >
           {sliderItems.map((item, index) => (
             <Tilt
-              key={item._id || index}
+              key={index}
               transitionSpeed={500}
               glareEnable={false}
               className="flex-shrink-0 rounded-xl overflow-hidden shadow-lg border-2 border-white/20 bg-white/10"
-              style={{ width: '100%', maxWidth: '260px', height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{
+                width: "100%",
+                maxWidth: "260px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
               data-aos="zoom-in"
             >
-              <Link
-                to={item.link}
-                     target="_blank"
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 className="flex flex-col items-center space-y-2 p-4 w-full"
               >
-                {/* Logo */}
                 <img
                   src={item.image}
                   alt={item.title}
                   className="h-14 sm:h-16 md:h-20 object-contain transform transition duration-500 hover:scale-110 hover:drop-shadow-[0_0_10px_#fff]"
                 />
-                {/* Name */}
-                <p className="text-md font-bold sm:text-base ">{item.title}</p>
-              </Link>
+                <p className="text-md font-bold sm:text-base">{item.title}</p>
+              </a>
             </Tilt>
           ))}
         </div>

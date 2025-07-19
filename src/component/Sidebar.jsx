@@ -71,7 +71,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeMenu, setAc
             {/* </div> */}
           </div>
           <div>
-            <span className="text-xl font-bold text-white">XIOCOIN</span>
+            <span className="text-xl font-bold text-white">IBOCOIN</span>
             <p className="text-xs text-slate-400">Admin Panel</p>
           </div>
         </div>

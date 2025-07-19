@@ -1,5 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
-import { getAllNews } from "../api/admin-api";
+
+// ✅ Static News Data (replace with your actual image URLs & links)
+const staticNewsData = [
+  {
+    _id: "1",
+    image: "/news-logo1.png",
+    link: "https://news1.example.com",
+  },
+  {
+    _id: "2",
+    image: "/news-logo2.png",
+    link: "https://news2.example.com",
+  },
+  {
+    _id: "3",
+    image: "/news-logo3.png",
+    link: "https://news3.example.com",
+  },
+  {
+    _id: "4",
+    image: "/news-logo4.png",
+    link: "https://news4.example.com",
+  },
+];
 
 const NewsListOnSection = () => {
   const [newsImages, setNewsImages] = useState([]);
@@ -9,29 +32,15 @@ const NewsListOnSection = () => {
   const isPausedRef = useRef(false);
 
   useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        const res = await getAllNews();
-        // API: { news: [ { images: [...] } ] }
-        if (res.news && Array.isArray(res.news) && res.news.length > 0) {
-          setNewsImages(res.news[0].images || []);
-        } else if (res.news && res.news.images) {
-          setNewsImages(res.news.images);
-        } else {
-          setNewsImages([]);
-        }
-      } catch {
-        setNewsImages([]);
-      }
-    };
-    fetchNews();
+    // Directly set static data
+    setNewsImages(staticNewsData);
   }, []);
 
-  const sliderItems = [...newsImages, ...newsImages]; // for infinite loop effect
+  const sliderItems = [...newsImages, ...newsImages]; // for infinite loop
 
   useEffect(() => {
     const slider = sliderRef.current;
-    let speed = 1.2;
+    const speed = 1.2;
 
     const animate = () => {
       if (slider && !isPausedRef.current) {
@@ -74,9 +83,15 @@ const NewsListOnSection = () => {
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
               className="flex-shrink-0 rounded-xl overflow-hidden shadow-lg border-2 border-white/20 bg-white/10"
-              style={{ width: '100%', maxWidth: '260px', height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{
+                width: '100%',
+                maxWidth: '260px',
+                height: 'auto',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
-              {/* Logo */}
               <img
                 src={item.image}
                 alt="news"
