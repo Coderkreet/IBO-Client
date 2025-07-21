@@ -17,6 +17,34 @@ export async function getPendingComplainHistory() {
   return response?.data;
 }
 
+export async function getXioData() {
+    const response = await axios.get(`${LendingApiURL}/landingpage/get-xio-data`,
+       {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    }
+    );
+  
+    return response?.data;
+  }
+
+
+  export async function purchaseXioCoin(payload) {
+  const response = await axios.post(`${LendingApiURL}/landingpage/purchase-xio-coin`, payload,
+     {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    }
+  );
+  console.log(response);
+  return response?.data;
+}
+
+
 export async function approveComplainRequest(id, responsePayload) {
   const res = await axios.post(
     `${apiURL}/support/status/approve/${id}`,
