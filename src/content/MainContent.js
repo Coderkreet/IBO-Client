@@ -16,8 +16,10 @@
 export const backendConfig = {
   // base: "https://500rvtdn-6092.inc1.devtunnels.ms/api",
   // origin: "https://500rvtdn-6092.inc1.devtunnels.ms/",
-  base: "https://ico-backend-e7fo.onrender.com/api",
-  origin: "https://ico-backend-e7fo.onrender.com/",
+  // base: "https://ico-backend-e7fo.onrender.com/api",
+  // origin: "https://ico-backend-e7fo.onrender.com/",
 //   base: "https://api.IBOCOIN.io/api",
 //  origin: "https://api.IBOCOIN.io",
+  "base": "http://localhost:6092/api",
+  "origin": "http://localhost:6092"
 };

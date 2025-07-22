@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Copy, Wallet, CheckCircle, ArrowRight, ArrowLeft, Zap, Shield, Globe, Sparkles } from 'lucide-react';
-
+import logo from '../assets/IBOLOGO.png'
 const TokenImportGuide = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [copied, setCopied] = useState('');
@@ -16,7 +16,7 @@ const TokenImportGuide = () => {
   // Mock token data (replace with your API call)
   const [tokenData, setTokenData] = useState([{
     tokenName: 'IBOCOIN',
-    symbol: 'XIO',
+    symbol: 'IBO',
     decimals: '18',
     address: '0x1234567890123456789012345678901234567890',
     network: 'Ethereum'
@@ -209,7 +209,7 @@ const TokenImportGuide = () => {
               <div className="absolute -inset-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur-lg opacity-60 group-hover:opacity-100 transition-all duration-500 animate-pulse"></div>
               <div className="relative w-24 h-24 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white text-3xl font-bold shadow-2xl transform group-hover:scale-110 transition-all duration-300">
                 <Sparkles className="absolute top-2 right-2 w-4 h-4 animate-spin" />
-                XIO
+           <img src={logo} alt="" />
               </div>
             </div>
           </div>

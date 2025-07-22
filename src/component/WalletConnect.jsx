@@ -6,10 +6,11 @@ import {
   getXioData,
   purchaseXioCoin,
 } from "../api/admin-api";
-import { SiTether } from "react-icons/si";
+import { SiBinance, SiTether } from "react-icons/si";
 import { ethers } from "ethers";
 import Swal from "sweetalert2";
 import USDTPaymentMain from "./USDTPaymentMain";
+import iboCoin from '../assets/IBOLOGO.png'
 
 // USDT Contract Configuration
 const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
@@ -20,12 +21,6 @@ const USDT_ABI = [
   "function balanceOf(address account) view returns (uint256)",
   "function decimals() view returns (uint8)",
 ];
-
-const getTokenPrice = async (symbol) => {
-  // Only fetch tether price (always 1)
-  if (symbol === "tether") return 1;
-  return 0;
-};
 
 const WalletConnectButton = () => {
   const { open } = useAppKit();
@@ -57,10 +52,10 @@ const WalletConnectButton = () => {
 
 const WalletConnect = () => {
   const [walletContent, setWalletContent] = useState(null);
-  const [logoUrl, setLogoUrl] = useState("");
+  const [logoUrl, setLogoUrl] = useState(iboCoin);
   const [saleEnabled, setSaleEnabled] = useState(true); // Toggle for purchase section
 
-  // Remove selectedToken state, always use 'usdt'
+  const [selectedToken] = useState("usdt");
   const [pricePerToken, setPricePerToken] = useState(0.012091);
   const [purchaseAmount, setPurchaseAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -154,7 +149,7 @@ const WalletConnect = () => {
           setXioData(xioData.data);
         }
         if (res?.data?.navLogo) {
-          setLogoUrl(res.data.navLogo);
+          setLogoUrl(iboCoin);
         }
       } catch (err) {
         console.error("Error fetching logo:", err);
@@ -179,13 +174,9 @@ const WalletConnect = () => {
     fetchWallets();
   }, []);
 
-
-
   const getTokenUSDValue = () => {
-    // Always 1:1 for USDT
     return (parseFloat(purchaseAmount || 0) * 1).toFixed(2);
   };
-
   const getTokenAmount = () => {
     const usd = getTokenUSDValue();
     return (parseFloat(usd) / pricePerToken).toFixed(2);
@@ -268,7 +259,7 @@ const WalletConnect = () => {
     setIsProcessing(true);
     try {
       // Connect wallet
-      const { provider, signer, userAddress } = await handleConnectWallet();
+      const { signer: walletSigner, userAddress: walletUserAddress } = await handleConnectWallet();
 
       // Check network
       const chainId = await window.ethereum.request({
@@ -278,37 +269,39 @@ const WalletConnect = () => {
         throw new Error("Please connect to BSC network first");
       }
 
-      // USDT Payment only
-      const usdtContract = new ethers.Contract(
-        USDT_ADDRESS,
-        USDT_ABI,
-        signer
-      );
+      if (selectedToken === "usdt") {
+        // USDT Payment
+        const usdtContract = new ethers.Contract(
+          USDT_ADDRESS,
+          USDT_ABI,
+          walletSigner
+        );
 
-      try {
-        const decimals = await usdtContract.decimals();
-        console.log(`Token decimals: ${decimals}`);
-      } catch (error) {
-        console.error("Error fetching USDT decimals:", error);
-        throw new Error("Invalid USDT contract on BSC network");
+        try {
+          const decimals = await usdtContract.decimals();
+          console.log(`Token decimals: ${decimals}`);
+        } catch (error) {
+          console.error("Error fetching USDT decimals:", error);
+          throw new Error("Invalid USDT contract on BSC network");
+        }
+
+        const balance = await usdtContract.balanceOf(walletUserAddress);
+        const amountInUSDT = ethers.parseUnits(purchaseAmount.toString(), 18);
+
+        if (balance < amountInUSDT) {
+          throw new Error("Insufficient USDT balance");
+        }
+
+        const tx = await usdtContract.transfer(recipientAddress, amountInUSDT);
+        await tx.wait();
+        console.log("Transaction hash:", tx.hash);
+
+        Swal.fire({
+          icon: "success",
+          title: "Payment Successful!",
+          text: `Successfully purchased ${getTokenAmount()} XIO tokens with ${purchaseAmount} USDT`,
+        });
       }
-
-      const balance = await usdtContract.balanceOf(userAddress);
-      const amountInUSDT = ethers.parseUnits(purchaseAmount.toString(), 18);
-
-      if (balance < amountInUSDT) {
-        throw new Error("Insufficient USDT balance");
-      }
-
-      const tx = await usdtContract.transfer(recipientAddress, amountInUSDT);
-      await tx.wait();
-      console.log("Transaction hash:", tx.hash);
-
-      Swal.fire({
-        icon: "success",
-        title: "Payment Successful!",
-        text: `Successfully purchased ${getTokenAmount()} XIO tokens with ${purchaseAmount} USDT`,
-      });
     } catch (error) {
       console.error("Error during payment:", error);
       Swal.fire({
@@ -411,13 +404,11 @@ const WalletConnect = () => {
         <div className="bg-black/20 backdrop-blur-sm rounded-3xl p-8 border border-white/10">
           <div className="flex justify-between items-center mb-8">
             <WalletConnectButton />
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                className="w-12 h-12 rounded-lg bg-white/10 p-1"
-                alt="logo"
-              />
-            ) : null}
+            <img
+              src={logoUrl}
+              className="w-12 h-12 rounded-lg bg-white/10 p-1"
+              alt="logo"
+            />
           </div>
 
           {!saleEnabled ? (
@@ -437,7 +428,7 @@ const WalletConnect = () => {
           ) : (
             <div className="text-white">
               <h2 className="text-2xl font-bold text-center mb-6 text-[#9797e4] tracking-wide">
-                &gt;&gt;&gt; BUY XIO &lt;&lt;&lt;
+                &gt;&gt;&gt; BUY IBO &lt;&lt;&lt;
               </h2>
               <div className="flex justify-center mb-4 gap-4 mt-6">
                 {Object.entries(timeLeft).map(([label, value]) => (
@@ -457,16 +448,156 @@ const WalletConnect = () => {
                   </div>
                 ))}
               </div>
-              {/* Remove BNB/USDT/OTHER buttons, only show USDT */}
+
+              <div className="grid sm:grid-cols-2 mt-8 gap-y-6 text-[1rem] text-gray-400 mb-4">
+                <div className="flex gap-x-4 justify-between sm:justify-start">
+                  Total Tokens Sold: <br />
+                  <span className="text-white font-semibold">
+                    {xioData?.soldQuantity || "0"}
+                  </span>
+                </div>
+                <div className="flex gap-x-4 justify-between sm:justify-start">
+                  Price: <br />
+                  <span className="text-white font-semibold">
+                    ${pricePerToken}
+                  </span>
+                </div>
+              </div>
+              <div className="flex justify-between items-center text-sm mb-1">
+                {/* Left: Phase Number */}
+                <div className="text-[#9797e4] text-xl font-semibold">
+                  Phase 22
+                </div>
+
+                {/* Right: Amount Raised */}
+                <div>
+                  Amount Raised:{" "}
+                  <span className="text-[#9797e4] font-semibold">
+                    $10,747,411.11
+                  </span>
+                </div>
+              </div>
+
+              <br />
+              <div className="mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="md:text-lg md:font-bold font-bold text-sm text-[#6b46c1] whitespace-nowrap">
+                    Stage {xioData?.stage}
+                  </div>
+                  <div className="relative h-3 bg-gray-800/50 rounded-full overflow-hidden border border-gray-600/30 flex-1 min-w-[120px] backdrop-blur-sm">
+                    {/* Striped background: Only shows in unfilled area */}
+                    <div className="absolute inset-0 z-0">
+                      <div
+                        className="h-full w-full opacity-25"
+                        style={{
+                          backgroundImage: `repeating-linear-gradient(
+              -45deg,
+              transparent,
+              transparent 3px,
+              #581c87 3px,
+              #581c87 4px
+            )`,
+                          backgroundSize: "12px 12px",
+                        }}
+                      />
+                    </div>
+
+                    {/* Filled progress bar */}
+                    <div
+                      className="absolute inset-y-0 left-0 z-10"
+                      style={{
+                        width: `${
+                          (xioData?.soldQuantity / xioData?.totalQuantity) * 100
+                        }%`,
+                      }}
+                    >
+                      <div className="h-full bg-gradient-to-r from-[#a855f7] via-[#7c3aed] to-[#6b46c1] rounded-full relative overflow-hidden">
+                        {/* Inner glow */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-white/10 rounded-full"></div>
+
+                        {/* Animated shine effect */}
+                        <div
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent rounded-full transform -skew-x-12 w-6"
+                          style={{
+                            animation: "shimmer 2s ease-in-out infinite",
+                            left: "-24px",
+                          }}
+                        ></div>
+
+                        {/* Outer glow */}
+                        <div className="absolute inset-0 rounded-full shadow-[0_0_12px_rgba(168,85,247,0.6)]"></div>
+                      </div>
+                    </div>
+
+                    {/* Progress indicator dot - only show when progress > 5% */}
+                    {(xioData?.soldQuantity / xioData?.totalQuantity) * 100 >
+                      5 && (
+                      <div
+                        className="absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 z-20 transition-all duration-300"
+                        style={{
+                          left: `${(tokenRaised / tokenTarget) * 100}%`,
+                        }}
+                      >
+                        <div className="w-4 h-4 bg-gradient-to-r from-[#a855f7] to-[#7c3aed] rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)] border-2 border-white/20">
+                          <div className="w-full h-full rounded-full bg-gradient-to-r from-white/30 to-transparent"></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-[#6b46c1] md:text-lg md:font-bold  font-bold text-sm whitespace-nowrap">
+                    {(
+                      (xioData?.soldQuantity / xioData?.totalQuantity) *
+                      100
+                    ).toFixed(1)}
+                    %
+                  </div>
+                </div>
+
+                <style jsx>{`
+                  @keyframes shimmer {
+                    0% {
+                      transform: translateX(-100%) skewX(-12deg);
+                    }
+                    100% {
+                      transform: translateX(400%) skewX(-12deg);
+                    }
+                  }
+                `}</style>
+              </div>
+              {/* Enhanced stats display */}
+              <div className="flex justify-center items-center mt-2 text-sm">
+                <div className="text-gray-400">
+                  {/* <span className="text-[#9797e4] font-semibold">{xioData?.soldQuantity}M</span> /{" "}
+                  {xioData?.totalQuantity}B */}
+                  <span className="text-[#9797e4] font-semibold">
+                    {xioData?.soldQuantity
+                      ? formatNumberWithSuffix(xioData?.soldQuantity)
+                      : 0}
+                  </span>{" "}
+                  /{" "}
+                  <span className="text-[#9797e4] font-semibold">
+                    {xioData?.totalQuantity
+                      ? formatNumberWithSuffix(xioData?.totalQuantity)
+                      : 0}
+                  </span>
+                </div>
+              </div>
               <div className="flex justify-between gap-2 my-6">
                 <button
-                  className="w-full py-2 rounded border flex items-center justify-center gap-2 bg-[#9797e4]"
+                  className={`w-full py-2 rounded border flex items-center justify-center gap-2 bg-[#9797e4]`}
                   disabled
                 >
                   <SiTether size={22} color="#26A17B" />
                   USDT
                 </button>
+                <button
+                  disabled
+                  className="w-full py-2 rounded bg-gray-800 text-gray-500 border border-gray-600 cursor-not-allowed"
+                >
+                  OTHER
+                </button>
               </div>
+
               <div className="text-sm text-gray-400 mb-1">Purchase Amount</div>
               <div className="flex items-center mb-4">
                 <input
@@ -479,9 +610,10 @@ const WalletConnect = () => {
                   className="flex-1 p-3 rounded bg-black border border-white/20 text-white"
                 />
                 <span className="ml-2 text-gray-300 font-semibold uppercase">
-                  USDT
+                  {selectedToken}
                 </span>
               </div>
+
               <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
                 <div className="p-3 bg-black border border-white/10 rounded">
                   <div className="text-gray-400">Amount You'll Get</div>
@@ -496,6 +628,7 @@ const WalletConnect = () => {
                   </div>
                 </div>
               </div>
+
               <button
                 className="w-full bg-[#9797e4] hover:bg-[#4f4f7f] transition p-3 rounded text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={checkValidPurchaseAmount}
@@ -511,34 +644,42 @@ const WalletConnect = () => {
                     Processing...
                   </div>
                 ) : (
-                  `BUY TOKENS WITH USDT`
+                  `BUY TOKENS WITH ${selectedToken.toUpperCase()}`
                 )}
               </button>
             </div>
           )}
-          <button
+
+          {/* Toggle Button (for testing mode only) */}
+          {/* <button
             onClick={() => setSaleEnabled(!saleEnabled)}
             className="mt-8 text-sm text-purple-300 underline"
           >
             Toggle {saleEnabled ? "Disabled" : "Enabled"} Mode
-          </button>
+          </button> */}
         </div>
+
+        {/* Right Section */}
+        {/* <div className="flex flex-col justify-center text-white text-center lg:text-left">
+          <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-[#7b05f1] via-[#AEA7D9] to-[#ff9bf3] text-transparent bg-clip-text">
+            Join the Oilconomy with XIO Token Presale
+          </h1>
+          <p className="text-gray-300 text-lg">XIO Protocol is the first Web3 ecosystem for people and businesses in the Oil and Gas industry.</p>
+        </div> */}
       </div>
+
       {showPaymentModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-gray-800 w-full max-w-md mx-4 rounded-xl border border-gray-700 shadow-2xl">
             <div className="p-6">
               <div className="flex flex-col items-center">
                 <div className="w-20 h-20 mb-6">
-                  {logoUrl ? (
-                    <img
-                      src={logoUrl}
-                      alt="App Logo"
-                      className="w-full h-full object-contain"
-                    />
-                  ) : null}
+                  <img
+                    src={logoUrl}
+                    alt="App Logo"
+                    className="w-full h-full object-contain"
+                  />
                 </div>
-                {/* Only show USDTPaymentMain */}
                 <USDTPaymentMain
                   amount={Number(purchaseAmount)}
                   walletType={walletType}
@@ -559,6 +700,7 @@ const WalletConnect = () => {
         </div>
       )}
     </div>
+
   );
 };
 

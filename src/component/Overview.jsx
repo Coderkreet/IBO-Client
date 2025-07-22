@@ -21,44 +21,52 @@ const Overview = () => {
 
   useEffect(() => {
     // Dummy data
-    const dummyOverview = {
-      text: "Introducing IBO Token",
-      topDescription: "Invest in the future of decentralized finance with the new IBO Token — secure, scalable, and community-driven.",
+    const IBOOverview = {
+      text: "IBO Coin Pre-Sale is Live!",
+      topDescription:
+        "Don’t miss the chance to get in early! IBO Coin is launching soon — a powerful DeFi token built for speed, security, and real-world adoption. Be among the first to invest in the future of finance.",
     };
 
-    const dummyCards = [
+    const IBOCards = [
       {
         _id: "1",
-        title: "What is IBO Token?",
+        title: "Why IBO Coin?",
         description:
-          "IBO Token is a next-gen cryptocurrency designed to power a decentralized investment ecosystem with unmatched security and scalability.",
-        image:updatecoin,
+          "IBO Coin isn't just another token — it's a movement toward democratizing financial access. With real-world use cases, low fees, and a fast-growing community, IBO Coin aims to redefine how we interact with decentralized finance.",
+        image: updatecoin,
       },
       {
         _id: "2",
-        title: "How to Invest?",
+        title: "Backed by Real Vision",
         description:
-          "Invest easily via BNB or USDT using our secure portal. Early investors enjoy exclusive bonuses and governance privileges.",
+          "Founded by a team of blockchain experts and financial strategists, IBO Coin is built on a mission to create transparent, secure, and scalable DeFi solutions that empower every investor — from newcomers to veterans.",
         image: updatecoin,
       },
       {
         _id: "3",
-        title: "Tokenomics",
+        title: "Secure & Audited Infrastructure",
         description:
-          "Total Supply: 1B | Circulating: 350M | Staking: Enabled | Burns: Monthly | Governance: DAO-driven for long-term growth.",
+          "Security is at the core of IBO Coin. Our smart contracts are rigorously audited by top-tier firms, ensuring your funds and data stay protected. We're fully committed to transparency, reliability, and compliance.",
         image: updatecoin,
       },
       {
         _id: "4",
-        title: "Roadmap & Utility",
+        title: "Community-Driven Growth",
         description:
-          "Phase 1: Launch\nPhase 2: DEX Integration\nPhase 3: NFT Ecosystem\nPhase 4: LaunchPad Support\nPhase 5: Global Partnerships",
-        image:updatecoin,
+          "At IBO, the community is the heartbeat. From feature proposals to ecosystem development, every voice matters. We're building a token *with* the people, *for* the people — where early supporters shape the future.",
+        image: updatecoin,
+      },
+      {
+        _id: "5",
+        title: "Pre-Sale Benefits",
+        description:
+          "Be among the first to join the IBO Coin revolution. Pre-sale investors enjoy discounted rates, bonus allocations, and early governance access. Limited supply available — act before the window closes.",
+        image: updatecoin,
       },
     ];
 
-    setOverview(dummyOverview);
-    setCards(dummyCards);
+    setOverview(IBOOverview);
+    setCards(IBOCards);
   }, []);
 
   useEffect(() => {
@@ -90,13 +98,6 @@ const Overview = () => {
     <FaChartLine className="text-[#AEA7D9] text-2xl" />,
   ];
 
-  const iconBorders = [
-    "border-[#4A088C] bg-[#AEA7D9]/10 shadow-[#4A088C]/20",
-    "border-[#120540] bg-[#AEA7D9]/10 shadow-[#120540]/20",
-    "border-[#433C73] bg-[#AEA7D9]/10 shadow-[#433C73]/20",
-    "border-[#AEA7D9] bg-[#AEA7D9]/10 shadow-[#AEA7D9]/20",
-  ];
-
   const gradients = [
     "from-[#4A088C]/20 to-[#4A088C]/5",
     "from-[#120540]/20 to-[#120540]/5",
@@ -107,7 +108,7 @@ const Overview = () => {
   return (
     <section
       ref={sectionRef}
-      className="w-full h-full bg-gradient-to-br from-[#120540] via-[#1b0a2d] to-[#433C73] text-white py-[5rem] px-6 sm:px-12 md:px-20 font-sans relative overflow-hidden"
+      className="w-full min-h-screen bg-gradient-to-br from-[#120540] via-[#1b0a2d] to-[#433C73] text-white py-[5rem] px-6 sm:px-12 md:px-20 font-sans relative overflow-hidden pb-[6rem]"
     >
       {/* Floating Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -145,7 +146,7 @@ const Overview = () => {
           </p>
         </div>
 
-        <div className="relative min-h-[500px]">
+        <div className="relative min-h-[600px]">
           {cards.map((item, index) => (
             <div
               key={item._id}
@@ -164,7 +165,9 @@ const Overview = () => {
                 </div>
                 <div className="space-y-6">
                   <div
-                    className={`p-8 rounded-3xl border border-white/10 bg-gradient-to-br ${gradients[index % gradients.length]} backdrop-blur-xl`}
+                    className={`p-8 rounded-3xl border border-white/10 bg-gradient-to-br ${
+                      gradients[index % gradients.length]
+                    } backdrop-blur-xl`}
                   >
                     <div className="flex items-start gap-6">
                       <div className="w-16 h-16 flex items-center justify-center rounded-xl border-2 shadow-xl">

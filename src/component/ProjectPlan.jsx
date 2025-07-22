@@ -1,77 +1,83 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CheckCircle, Circle, Calendar, Target, Zap, Users, Rocket, Trophy } from "lucide-react";
 
-const dummyData = {
+const roadmapData = {
   "2025": [
     {
       quarter: "Q1",
-      milestone: "Token Launch & Listing",
+      milestone: "Token Launch & Exchange Listing",
       status: "completed",
       progress: 100,
       icon: Rocket,
       color: "from-green-400 to-green-600",
       points: [
-        "Launch of IBO Token",
-        "Listed on PancakeSwap & Uniswap",
-        "Smart contract audit complete",
+        "Official launch of IBO Coin on BSC network",
+        "Initial listing on PancakeSwap",
+        "Smart contract audit completed by CertiK",
+        "Launch of IBO project whitepaper v1.0",
       ],
     },
     {
       quarter: "Q2",
-      milestone: "Staking & Rewards",
+      milestone: "Staking Platform & Yield Features",
       status: "in-progress",
-      progress: 65,
+      progress: 70,
       icon: Trophy,
       color: "from-blue-400 to-blue-600",
       points: [
-        "Launch staking dashboard",
-        "Early adopter rewards distribution",
-        "Add LP farming pools",
+        "Launch of staking dashboard with live rewards",
+        "LP farming pools activated for BNB/IBO pair",
+        "Reward distribution for early backers begins",
+        "Security review & performance monitoring",
       ],
     },
     {
       quarter: "Q3",
-      milestone: "Partnerships & Integrations",
+      milestone: "Ecosystem Integrations & Tools",
       status: "upcoming",
       progress: 0,
       icon: Users,
       color: "from-purple-400 to-purple-600",
       points: [
-        "Collaborate with Web3 wallets",
-        "API integrations with dApps",
-        "New DeFi feature rollout",
+        "Integration with major Web3 wallets (e.g. Trust Wallet, MetaMask)",
+        "Partnership announcements with key DeFi protocols",
+        "Beta release of IBO Swap and IBO Wallet",
+        "User onboarding with secure KYC-less identity verification",
       ],
     },
   ],
   "2026": [
     {
       quarter: "Q1",
-      milestone: "Global Expansion",
+      milestone: "Global Expansion & Compliance",
       status: "upcoming",
       progress: 0,
       icon: Target,
       color: "from-orange-400 to-orange-600",
       points: [
-        "Marketing push in EU and Asia",
-        "Onboarding major exchanges",
-        "Launch ambassador program",
+        "Targeted marketing in Europe, SEA, and Middle East",
+        "Onboarding to Tier-1 exchanges (e.g. Gate.io, KuCoin)",
+        "Begin regional partnerships with fintech platforms",
+        "Launch of IBO legal & compliance roadmap",
       ],
     },
     {
       quarter: "Q2",
-      milestone: "NFT Launchpad",
+      milestone: "IBO NFT & Launchpad Rollout",
       status: "upcoming",
       progress: 0,
       icon: Zap,
       color: "from-pink-400 to-pink-600",
       points: [
-        "NFT minting support",
-        "Launch NFT marketplace",
-        "Exclusive airdrops for holders",
+        "Launchpad support for new crypto startups",
+        "Launch of IBO NFT Marketplace & Creator Studio",
+        "Minting tools and limited-edition IBO NFTs for holders",
+        "Launch of creator/investor airdrop reward programs",
       ],
     },
   ],
 };
+
 
 const ProjectPlan = () => {
   const [activeYear, setActiveYear] = useState("2025");
@@ -215,7 +221,7 @@ const ProjectPlan = () => {
 
         {/* Year Tabs */}
         <div className="flex justify-center flex-wrap gap-4 mb-16">
-          {Object.keys(dummyData).map((year) => (
+          {Object.keys(roadmapData).map((year) => (
             <button
               key={year}
               onClick={() => setActiveYear(year)}
@@ -245,8 +251,8 @@ const ProjectPlan = () => {
 
         {/* Roadmap Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {dummyData[activeYear]?.length > 0 ? (
-            dummyData[activeYear].map((item, index) => {
+          {roadmapData[activeYear]?.length > 0 ? (
+            roadmapData[activeYear].map((item, index) => {
               const IconComponent = item.icon;
               return (
                 <div
@@ -322,7 +328,7 @@ const ProjectPlan = () => {
                   </div>
 
                   {/* Connection Line for larger screens */}
-                  {index < dummyData[activeYear].length - 1 && (
+                  {index < roadmapData[activeYear].length - 1 && (
                     <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-[#4A088C] to-[#AEA7D9] transform -translate-y-1/2 z-10"></div>
                   )}
                 </div>

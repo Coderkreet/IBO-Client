@@ -247,9 +247,9 @@ const Footer = () => {
               <a href="#" className="block text-gray-400 hover:text-white transition-colors duration-200 hover:translate-x-1 transform">
                 Help Center
               </a>
-              <a href="/login" className="block text-gray-400 hover:text-white transition-colors duration-200 hover:translate-x-1 transform">
+              {/* <a href="/login" className="block text-gray-400 hover:text-white transition-colors duration-200 hover:translate-x-1 transform">
                 Admin Login
-              </a>
+              </a> */}
             </div>
           </div>
         </div>

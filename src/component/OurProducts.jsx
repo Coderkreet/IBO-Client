@@ -12,32 +12,37 @@ const OurProducts = () => {
   const [section] = useState({
     text: 'Our Products',
     description: 'Explore our wide range of innovative products designed to accelerate your blockchain journey.',
-    cards: [
-      {
-        title: 'XIO Swap',
-        url: 'https://xioswap.io',
-        image: 'https://via.placeholder.com/400x300.png?text=XIO+Swap',
-        description: 'Seamless token swapping with advanced DeFi features'
-      },
-      {
-        title: 'XIO Wallet',
-        url: 'https://xiowallet.io',
-        image: 'https://via.placeholder.com/400x300.png?text=XIO+Wallet',
-        description: 'Secure multi-chain wallet for your digital assets'
-      },
-      {
-        title: 'XIO Bridge',
-        url: 'https://xiobridge.io',
-        image: 'https://via.placeholder.com/400x300.png?text=XIO+Bridge',
-        description: 'Cross-chain bridge for seamless asset transfers'
-      },
-      {
-        title: 'XIO Launchpad',
-        url: 'https://xiolaunch.io',
-        image: 'https://via.placeholder.com/400x300.png?text=XIO+Launchpad',
-        description: 'Launch your projects with our comprehensive platform'
-      }
-    ]
+  cards: [
+  {
+    title: "IBO Swap",
+    url: "https://swap.ibocoin.io",
+    image: "https://via.placeholder.com/400x300.png?text=IBO+Swap",
+    description:
+      "IBO Swap is our decentralized exchange (DEX), enabling fast, secure, and low-fee token swaps within the IBO ecosystem. Built for scalability and ease of use.",
+  },
+  {
+    title: "IBO Wallet",
+    url: "https://wallet.ibocoin.io",
+    image: "https://via.placeholder.com/400x300.png?text=IBO+Wallet",
+    description:
+      "Securely store, send, and manage your IBO and other supported tokens with IBO Wallet — a non-custodial, multi-chain crypto wallet designed for both beginners and pros.",
+  },
+  {
+    title: "IBO Bridge",
+    url: "https://bridge.ibocoin.io",
+    image: "https://via.placeholder.com/400x300.png?text=IBO+Bridge",
+    description:
+      "IBO Bridge allows seamless asset transfers across blockchain networks, empowering true interoperability between Ethereum, BSC, and upcoming supported chains.",
+  },
+  {
+    title: "IBO Launchpad",
+    url: "https://launchpad.ibocoin.io",
+    image: "https://via.placeholder.com/400x300.png?text=IBO+Launchpad",
+    description:
+      "A next-gen token launch platform helping emerging blockchain projects with smart contract deployment, community funding, and trusted investor onboarding.",
+  },
+]
+
   });
 
   useEffect(() => {

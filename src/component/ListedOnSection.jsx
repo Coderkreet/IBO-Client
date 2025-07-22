@@ -2,45 +2,46 @@ import React, { useEffect, useRef } from "react";
 import Tilt from "react-parallax-tilt";
 import AOS from "aos";
 import "aos/dist/aos.css";
-
+import slider4 from '../assets/slider4.png'
+import slider2 from '../assets/image.png'
+import slider3 from '../assets/images/image.png'
+import slider1 from '../assets/coinstore-logo.png'
+import slider6 from '../assets/TrustWallet.png'
 const ListedOnSection = () => {
   const sliderRef = useRef(null);
   const animationFrameRef = useRef(null);
   const scrollAmountRef = useRef(0);
   const isPausedRef = useRef(false);
 
-  const platforms = [
-    {
-      title: "Trust Wallet",
-      link: "https://trustwallet.com/",
-      image: "https://seeklogo.com/images/T/trustwallet-logo-112F8E2965-seeklogo.com.png",
-    },
-    {
-      title: "BitMart",
-      link: "https://www.bitmart.com/",
-      image: "https://cryptologos.cc/logos/bitmart-token-bmx-logo.png",
-    },
-    {
-      title: "Hello",
-      link: "https://www.hello.one/",
-      image: "https://hello.one/images/logo-white.svg",
-    },
-    {
-      title: "CoinStore",
-      link: "https://www.coinstore.com/",
-      image: "https://assets-global.website-files.com/6375cba9371ee5c68686baf3/6375cba9371ee55aa886bafb_Coinstore_Logo.png",
-    },
-    {
-      title: "XT.COM",
-      link: "https://www.xt.com/",
-      image: "https://pbs.twimg.com/profile_images/1753245290717325312/ZZH-4Xcv_400x400.jpg",
-    },
-    {
-      title: "MEXC",
-      link: "https://www.mexc.com/",
-      image: "https://cryptologos.cc/logos/mexc-global-mexc-logo.png",
-    },
-  ];
+const platforms = [
+  {
+    title: "Trust Wallet",
+    link: "https://trustwallet.com/", 
+    image: slider6
+  },
+  {
+    title: "MEXC",
+    link: "https://www.mexc.com/", 
+    image: slider4
+  },
+  {
+    title: "XT.COM",
+    link: "https://www.xt.com/", 
+    image:slider2
+  },
+  {
+    title: "BitMart",
+    link: "https://www.bitmart.com/", 
+    image:slider3
+  },
+  {
+    title: "CoinStore",
+    link: "https://www.coinstore.com/", 
+    image: slider1
+  },
+];
+
+
 
   const sliderItems = [...platforms, ...platforms]; // duplicated for loop scroll
 

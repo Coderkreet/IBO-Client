@@ -28,99 +28,102 @@ const colors = [
 
 // Static data with enhanced structure
 const staticTokenomicsData = [
-  { 
-    name: "Public Sale", 
-    value: 25, 
-    tokens: "250,000", 
+  {
+    name: "Public Sale",
+    value: 25,
+    tokens: "250,000",
     color: colors[0],
     icon: Globe,
-    description: "Available for public purchase",
+    description: "Available for public participation during pre-sale.",
     locked: false,
-    vestingPeriod: "0 months"
+    vestingPeriod: "0 months",
   },
-  { 
-    name: "Team & Advisors", 
-    value: 20, 
-    tokens: "200,000", 
+  {
+    name: "Team & Advisors",
+    value: 20,
+    tokens: "200,000",
     color: colors[1],
     icon: Users,
-    description: "Reserved for team and advisors",
+    description: "Allocated to the core team and advisors with vesting.",
     locked: true,
-    vestingPeriod: "12 months"
+    vestingPeriod: "12 months",
   },
-  { 
-    name: "Marketing", 
-    value: 15, 
-    tokens: "150,000", 
+  {
+    name: "Marketing & Growth",
+    value: 15,
+    tokens: "150,000",
     color: colors[2],
     icon: Target,
-    description: "Marketing and partnerships",
+    description: "Used for branding, influencer partnerships, and growth campaigns.",
     locked: false,
-    vestingPeriod: "6 months"
+    vestingPeriod: "6 months",
   },
-  { 
-    name: "Staking", 
-    value: 20, 
-    tokens: "200,000", 
+  {
+    name: "Staking Rewards",
+    value: 20,
+    tokens: "200,000",
     color: colors[3],
     icon: Shield,
-    description: "Staking rewards pool",
+    description: "Distributed to users staking IBO via the platform.",
     locked: true,
-    vestingPeriod: "3 months"
+    vestingPeriod: "3 months",
   },
-  { 
-    name: "Reserve", 
-    value: 20, 
-    tokens: "200,000", 
+  {
+    name: "Reserve Fund",
+    value: 20,
+    tokens: "200,000",
     color: colors[4],
     icon: Coins,
-    description: "Emergency reserve fund",
+    description: "Held in reserve for future ecosystem development or emergencies.",
     locked: true,
-    vestingPeriod: "24 months"
+    vestingPeriod: "24 months",
   },
 ];
 
+
 const staticMarketStats = {
-  price: "0.2345",
-  change24h: -2.15,
-  marketCap: "1,234,567",
-  volume24h: "345,678",
+  price: "1.00",
+  change24h: -1.05,
+  marketCap: "800,000", // 800k circulating x $1
+  volume24h: "125,000",
   priceHistory: [
-    { time: "00:00", price: 0.2400 },
-    { time: "04:00", price: 0.2380 },
-    { time: "08:00", price: 0.2350 },
-    { time: "12:00", price: 0.2345 },
-    { time: "16:00", price: 0.2360 },
-    { time: "20:00", price: 0.2340 },
-    { time: "24:00", price: 0.2345 },
-  ]
+    { time: "00:00", price: 1.01 },
+    { time: "04:00", price: 1.00 },
+    { time: "08:00", price: 0.99 },
+    { time: "12:00", price: 1.00 },
+    { time: "16:00", price: 1.01 },
+    { time: "20:00", price: 1.00 },
+    { time: "24:00", price: 1.00 },
+  ],
 };
 
+
 const staticTokenTrackers = {
-  totalHolders: 123456,
-  holdersChange: 5.6,
-  totalTransactions: 78910,
-  transactionsChange: 3.2,
-  circulatingSupply: 800000,
+  totalHolders: 135000,
+  holdersChange: 4.8,
+  totalTransactions: 84200,
+  transactionsChange: 2.1,
+  circulatingSupply: 800000, // Matches market cap
   totalSupply: 1000000,
-  BurnedToken: 200000,
+  BurnedToken: 200000, // Already burned
   holdersHistory: [
-    { month: "Jan", holders: 50000 },
-    { month: "Feb", holders: 75000 },
+    { month: "Jan", holders: 45000 },
+    { month: "Feb", holders: 70000 },
     { month: "Mar", holders: 95000 },
-    { month: "Apr", holders: 110000 },
-    { month: "May", holders: 123456 },
+    { month: "Apr", holders: 120000 },
+    { month: "May", holders: 135000 },
   ],
   transactionHistory: [
-    { day: "Mon", transactions: 1200 },
-    { day: "Tue", transactions: 1800 },
-    { day: "Wed", transactions: 2100 },
-    { day: "Thu", transactions: 1600 },
-    { day: "Fri", transactions: 2400 },
-    { day: "Sat", transactions: 1900 },
-    { day: "Sun", transactions: 1500 },
-  ]
+    { day: "Mon", transactions: 1600 },
+    { day: "Tue", transactions: 2100 },
+    { day: "Wed", transactions: 2400 },
+    { day: "Thu", transactions: 2000 },
+    { day: "Fri", transactions: 2700 },
+    { day: "Sat", transactions: 2300 },
+    { day: "Sun", transactions: 2100 },
+  ],
 };
+
 
 export default function TokenomicsTabsStatic() {
   const [activeTab, setActiveTab] = useState("Token");

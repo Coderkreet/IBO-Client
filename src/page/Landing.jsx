@@ -61,7 +61,7 @@ const Landing = () => {
 
 
       <div  id="platform">
-        <PlatformSection />
+      <Slider data={sliderData1} direction="left" />
       </div>
       <div id="IBOCOIN-blockchain">
 

@@ -1,26 +1,29 @@
 import React, { useEffect, useRef, useState } from "react";
-
+import image1 from '../assets/news/image1.png'
+import image2 from '../assets/news/image2.png'
+import image3 from '../assets/news/image3.png'
+import image4 from '../assets/news/image4.png'
 // ✅ Static News Data (replace with your actual image URLs & links)
 const staticNewsData = [
   {
     _id: "1",
-    image: "/news-logo1.png",
-    link: "https://news1.example.com",
+    image: image1,
+    link: "https://cointelegraph.com",
   },
   {
     _id: "2",
-    image: "/news-logo2.png",
-    link: "https://news2.example.com",
+    image: image2,
+    link: "https://cryptoslate.com",
   },
   {
     _id: "3",
-    image: "/news-logo3.png",
-    link: "https://news3.example.com",
+    image: image3,
+    link: "https://cryptobriefing.com",
   },
   {
     _id: "4",
-    image: "/news-logo4.png",
-    link: "https://news4.example.com",
+    image:image4, // CoinDesk
+    link: "https://coindesk.com",
   },
 ];
 

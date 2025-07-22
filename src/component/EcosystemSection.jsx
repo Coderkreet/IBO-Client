@@ -3,41 +3,41 @@ import { FaCogs } from 'react-icons/fa';
 
 const EcosystemSection = () => {
   const [ecosystemData] = useState({
-    title: "Ecosystem",
-    description:
-      "The ecosystem of IBOCOIN revolves around creating a seamless and efficient marketplace for digital assets, particularly focusing on decentralized finance and blockchain innovation.",
-    cards: [
-      {
-        serialNumber: "01",
-        text: "Decentralized Trading Platform",
-        logo: "https://cdn-icons-png.flaticon.com/512/857/857681.png"
-      },
-      {
-        serialNumber: "02",
-        text: "Secure Smart Wallet Integration",
-        logo: "https://cdn-icons-png.flaticon.com/512/633/633611.png"
-      },
-      {
-        serialNumber: "03",
-        text: "Blockchain-Powered Identity Verification",
-        logo: "https://cdn-icons-png.flaticon.com/512/906/906175.png"
-      },
-      {
-        serialNumber: "04",
-        text: "DeFi Lending & Borrowing Ecosystem",
-        logo: "https://cdn-icons-png.flaticon.com/512/929/929564.png"
-      },
-      {
-        serialNumber: "05",
-        text: "AI-Powered Risk Management",
-        logo: "https://cdn-icons-png.flaticon.com/512/1242/1242309.png"
-      },
-      {
-        serialNumber: "06",
-        text: "Cross-Chain Asset Bridge",
-        logo: "https://cdn-icons-png.flaticon.com/512/860/860814.png"
-      }
-    ]
+   title: "IBO Coin Ecosystem",
+  description:
+    "The IBO Coin ecosystem is designed to unlock the full potential of decentralized finance (DeFi), combining innovation, security, and usability. From seamless trading to secure identity solutions, our ecosystem is built for both individual users and institutional adoption.",
+  cards: [
+    {
+      serialNumber: "01",
+      text: "Decentralized Exchange (DEX)",
+      logo: "https://cdn-icons-png.flaticon.com/512/857/857681.png",
+    },
+    {
+      serialNumber: "02",
+      text: "Multi-Asset Smart Wallet",
+      logo: "https://cdn-icons-png.flaticon.com/512/633/633611.png",
+    },
+    {
+      serialNumber: "03",
+      text: "KYC-less Identity Layer with Blockchain Verification",
+      logo: "https://cdn-icons-png.flaticon.com/512/906/906175.png",
+    },
+    {
+      serialNumber: "04",
+      text: "Peer-to-Peer Lending and Yield Farming",
+      logo: "https://cdn-icons-png.flaticon.com/512/929/929564.png",
+    },
+    {
+      serialNumber: "05",
+      text: "AI-Driven Portfolio & Risk Manager",
+      logo: "https://cdn-icons-png.flaticon.com/512/1242/1242309.png",
+    },
+    {
+      serialNumber: "06",
+      text: "Cross-Chain Bridge for Multi-Network Transfers",
+      logo: "https://cdn-icons-png.flaticon.com/512/860/860814.png",
+    },
+  ],
   });
 
   const sectionRef = useRef(null);

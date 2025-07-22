@@ -15,7 +15,7 @@ const Navbar = () => {
         { label: 'Tokenomics', path: '#tokenomics' },
         { label: 'Events', path: '#events' },
         { label: 'FAQ', path: '#faq' },
-        { label: 'Blogs', path: '/blogs' },
+        // { label: 'Blogs', path: '/blogs' },
     ];
 
     const scrollToTop = () => {
@@ -107,7 +107,7 @@ const Navbar = () => {
               })}
             </div>
             {/* Desktop Action Buttons */}
-            <div className="hidden lg:flex items-center space-x-4">
+            {/* <div className="hidden lg:flex items-center space-x-4">
               <Link >
                 <button
             onClick={() => window.open('https://xiowallet.com/', '_blank', 'noopener,noreferrer')}
@@ -116,7 +116,7 @@ const Navbar = () => {
                    Xio Wallet
                 </button>
               </Link>
-            </div>
+            </div> */}
             {/* Mobile Menu Button */}
             <div className="xl:hidden">
               <button
